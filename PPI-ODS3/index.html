@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriScan - Análise Nutricional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- CABEÇALHO -->
+        <header>
+            <h1>🔍 NutriScan</h1>
+            <p>Análise nutricional com inteligência artificial</p>
+        </header>
+
+        <!-- ÁREA DE LOGIN -->
+        <div id="area-login">
+            <div class="login-box">
+                <h3>🔐 Login</h3>
+                <form id="formLogin" onsubmit="event.preventDefault(); fazerLogin();">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginSenha" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                    <span>ou <a href="#" onclick="mostrarCadastro()">Cadastre-se</a></span>
+                </form>
+                <form id="formCadastro" style="display:none;" onsubmit="event.preventDefault(); fazerCadastro();">
+                    <input type="text" id="cadastroNome" placeholder="Nome" required>
+                    <input type="email" id="cadastroEmail" placeholder="Email" required>
+                    <input type="password" id="cadastroSenha" placeholder="Senha" required>
+                    <button type="submit">Cadastrar</button>
+                    <span>ou <a href="#" onclick="mostrarLogin()">Já tenho conta</a></span>
+                </form>
+            </div>
+        </div>
+
+        <!-- ÁREA DO USUÁRIO LOGADO -->
+        <div id="area-logado" style="display:none;">
+            <div class="usuario-info">
+                <span>👋 Olá, <strong id="usuario-nome"></strong>!</span>
+                <button onclick="fazerLogout()" class="btn-sair">Sair</button>
+            </div>
+        </div>
+
+        <!-- BUSCA -->
+        <div class="busca-area">
+            <input type="text" id="campoBusca" placeholder="Digite o nome do produto...">
+            <button id="btnBuscar">Buscar</button>
+            <button id="btnCamera">📷 Câmera</button>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div id="resultados" class="resultados-grid">
+            <p style="color:#999; text-align:center; width:100%;">Faça uma busca para ver os produtos</p>
+        </div>
+
+        <!-- RANKING -->
+        <div id="ranking-container">
+            <h2>🏆 Meu Ranking de Alimentos Saudáveis</h2>
+            <div id="ranking-lista">
+                <p style="color:#999;">Nenhum produto pesquisado ainda.</p>
+            </div>
+            
+            <div id="ranking-global-container" style="display:none; margin-top:30px;">
+                <h2>🌍 Ranking Global da Comunidade</h2>
+                <div id="ranking-global-lista"></div>
+            </div>
+
+            <button onclick="limparHistorico()" class="btn-limpar" style="display:none;" id="btnLimparHistorico">
+                🗑️ Limpar Histórico
+            </button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
