@@ -6,72 +6,211 @@
     <title>NutriScan - Análise Nutricional</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
     <div class="container">
+
         <!-- CABEÇALHO -->
         <header>
             <h1>🔍 NutriScan</h1>
             <p>Análise nutricional com inteligência artificial</p>
+
+            <!-- BOTÃO LOGIN -->
+            <button id="btnLogin" onclick="mostrarLoginArea()">
+                🔐 Login
+            </button>
         </header>
 
+
         <!-- ÁREA DE LOGIN -->
-        <div id="area-login">
+        <div id="area-login" style="display: none;">
+
             <div class="login-box">
+
                 <h3>🔐 Login</h3>
-                <form id="formLogin" onsubmit="event.preventDefault(); fazerLogin();">
-                    <input type="email" id="loginEmail" placeholder="Email" required>
-                    <input type="password" id="loginSenha" placeholder="Senha" required>
-                    <button type="submit">Entrar</button>
-                    <span>ou <a href="#" onclick="mostrarCadastro()">Cadastre-se</a></span>
+
+                <!-- FORMULÁRIO DE LOGIN -->
+                <form id="formLogin"
+                      onsubmit="event.preventDefault(); fazerLogin();">
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Email"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        id="loginSenha"
+                        placeholder="Senha"
+                        required
+                    >
+
+                    <button type="submit">
+                        Entrar
+                    </button>
+
+                    <span>
+                        ou
+                        <a href="#" onclick="mostrarCadastro(); return false;">
+                            Cadastre-se
+                        </a>
+                    </span>
+
                 </form>
-                <form id="formCadastro" style="display:none;" onsubmit="event.preventDefault(); fazerCadastro();">
-                    <input type="text" id="cadastroNome" placeholder="Nome" required>
-                    <input type="email" id="cadastroEmail" placeholder="Email" required>
-                    <input type="password" id="cadastroSenha" placeholder="Senha" required>
-                    <button type="submit">Cadastrar</button>
-                    <span>ou <a href="#" onclick="mostrarLogin()">Já tenho conta</a></span>
+
+
+                <!-- FORMULÁRIO DE CADASTRO -->
+                <form id="formCadastro"
+                      style="display: none;"
+                      onsubmit="event.preventDefault(); fazerCadastro();">
+
+                    <input
+                        type="text"
+                        id="cadastroNome"
+                        placeholder="Nome"
+                        required
+                    >
+
+                    <input
+                        type="email"
+                        id="cadastroEmail"
+                        placeholder="Email"
+                        required
+                    >
+
+                    <input
+                        type="password"
+                        id="cadastroSenha"
+                        placeholder="Senha"
+                        required
+                    >
+
+                    <button type="submit">
+                        Cadastrar
+                    </button>
+
+                    <span>
+                        ou
+                        <a href="#" onclick="mostrarLogin(); return false;">
+                            Já tenho conta
+                        </a>
+                    </span>
+
                 </form>
+
+
+                <!-- BOTÃO FECHAR -->
+                <button onclick="fecharLoginArea()" class="btn-fechar">
+                    Fechar
+                </button>
+
             </div>
+
         </div>
 
+
         <!-- ÁREA DO USUÁRIO LOGADO -->
-        <div id="area-logado" style="display:none;">
+        <div id="area-logado" style="display: none;">
+
             <div class="usuario-info">
-                <span>👋 Olá, <strong id="usuario-nome"></strong>!</span>
-                <button onclick="fazerLogout()" class="btn-sair">Sair</button>
+
+                <span>
+                    👋 Olá,
+                    <strong id="usuario-nome"></strong>!
+                </span>
+
+                <button
+                    onclick="fazerLogout()"
+                    class="btn-sair">
+                    Sair
+                </button>
+
             </div>
+
         </div>
+
 
         <!-- BUSCA -->
         <div class="busca-area">
-            <input type="text" id="campoBusca" placeholder="Digite o nome do produto...">
-            <button id="btnBuscar">Buscar</button>
-            <button id="btnCamera">📷 Câmera</button>
+
+            <input
+                type="text"
+                id="campoBusca"
+                placeholder="Digite o nome do produto..."
+            >
+
+            <button id="btnBuscar">
+                Buscar
+            </button>
+
+            <button id="btnCamera">
+                📷 Câmera
+            </button>
+
         </div>
+
 
         <!-- RESULTADOS -->
         <div id="resultados" class="resultados-grid">
-            <p style="color:#999; text-align:center; width:100%;">Faça uma busca para ver os produtos</p>
+
+            <p style="color:#999; text-align:center; width:100%;">
+                Faça uma busca para ver os produtos
+            </p>
+
         </div>
+
 
         <!-- RANKING -->
         <div id="ranking-container">
-            <h2>🏆 Meu Ranking de Alimentos Saudáveis</h2>
+
+            <h2>
+                🏆 Meu Ranking de Alimentos Saudáveis
+            </h2>
+
             <div id="ranking-lista">
-                <p style="color:#999;">Nenhum produto pesquisado ainda.</p>
-            </div>
-            
-            <div id="ranking-global-container" style="display:none; margin-top:30px;">
-                <h2>🌍 Ranking Global da Comunidade</h2>
-                <div id="ranking-global-lista"></div>
+
+                <p style="color:#999;">
+                    Nenhum produto pesquisado ainda.
+                </p>
+
             </div>
 
-            <button onclick="limparHistorico()" class="btn-limpar" style="display:none;" id="btnLimparHistorico">
+
+            <!-- RANKING GLOBAL -->
+            <div
+                id="ranking-global-container"
+                style="display:none; margin-top:30px;">
+
+                <h2>
+                    🌍 Ranking Global da Comunidade
+                </h2>
+
+                <div id="ranking-global-lista"></div>
+
+            </div>
+
+
+            <!-- LIMPAR HISTÓRICO -->
+            <button
+                onclick="limparHistorico()"
+                class="btn-limpar"
+                style="display:none;"
+                id="btnLimparHistorico">
+
                 🗑️ Limpar Histórico
+
             </button>
+
         </div>
+
     </div>
 
+
+    <!-- JAVASCRIPT -->
     <script src="js/script.js"></script>
+
 </body>
 </html>
