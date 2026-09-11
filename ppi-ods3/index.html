@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriScan - Análise Nutricional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+    <header class="cabecalho">
+        <div class="logo">
+            <div class="logo-icone">🔍</div>
+            <div>
+                <h1>NutriScan</h1>
+                <p>Análise nutricional inteligente</p>
+            </div>
+        </div>
+
+        <nav class="navegacao">
+            <a href="#" id="linkRanking">🏆 Ranking</a>
+            <a href="#" id="linkHistorico">↩ Histórico</a>
+            <a href="#" id="linkFavoritos">♡ Favoritos</a>
+            <button id="btnLogin">🔐 Login</button>
+            <button id="btnLogout" style="display:none;">🚪 Sair</button>
+            <span id="usuarioLogado" style="display:none;font-size:13px;color:#79518c;"></span>
+        </nav>
+    </header>
+
+    <!-- MODAL LOGIN -->
+    <div id="area-login" class="login-overlay">
+        <div class="login-box">
+            <button class="fechar-login" data-fechar-login>×</button>
+            <h2 id="titulo-login">Entrar no NutriScan</h2>
+
+            <form id="formLogin">
+                <input type="email" id="loginEmail" placeholder="Seu email" required>
+                <input type="password" id="loginSenha" placeholder="Sua senha" required>
+                <button type="submit">Entrar</button>
+                <p>Não possui conta? <a href="#" id="linkCadastro">Cadastre-se</a></p>
+            </form>
+
+            <form id="formCadastro" style="display:none;">
+                <input type="text" id="cadastroNome" placeholder="Seu nome" required>
+                <input type="email" id="cadastroEmail" placeholder="Seu email" required>
+                <input type="password" id="cadastroSenha" placeholder="Crie uma senha" required>
+                <button type="submit">Criar conta</button>
+                <p>Já possui uma conta? <a href="#" id="linkLogin">Fazer login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL RANKING -->
+    <div id="modalRanking" class="login-overlay">
+        <div class="login-box">
+            <button class="fechar-login" data-fechar-ranking>×</button>
+            <h2>🏆 Meu Ranking</h2>
+            <div id="ranking-modal-lista">
+                <p>Nenhum produto pesquisado ainda.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTÓRICO -->
+    <div id="modalHistorico" class="login-overlay">
+        <div class="login-box">
+            <button class="fechar-login" data-fechar-historico>×</button>
+            <h2>🕘 Histórico</h2>
+            <div id="historico-modal-lista">
+                <p>Nenhuma pesquisa recente.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FAVORITOS -->
+    <div id="modalFavoritos" class="login-overlay">
+        <div class="login-box">
+            <button class="fechar-login" data-fechar-favoritos>×</button>
+            <h2>♡ Favoritos</h2>
+            <div id="favoritos-modal-lista">
+                <p>Seus alimentos favoritos aparecerão aqui.</p>
+            </div>
+        </div>
+    </div>
+
+    <main>
+
+        <section class="conteudo-principal">
+
+            <section class="hero">
+                <span class="badge">✨ Análise nutricional com inteligência artificial</span>
+                <h2>Escolha alimentos<br>mais saudáveis</h2>
+                <p>Busque um produto ou fotografe o rótulo para ver a tabela nutricional completa e descobrir alternativas com melhor custo-benefício.</p>
+            </section>
+
+            <section class="secao-busca">
+                <div class="barra-busca">
+                    <span class="icone-busca">🔍</span>
+                    <input type="text" id="campoBusca" placeholder="Buscar produto por nome ou marca...">
+                    <button id="btnBuscar">Buscar</button>
+                </div>
+
+                <div class="categorias">
+                    <span>Sugestões:</span>
+                    <div class="categorias-lista">
+                        <button data-categoria="leite">🥛 Leite</button>
+                        <button data-categoria="arroz">🍚 Arroz</button>
+                        <button data-categoria="feijão">🫘 Feijão</button>
+                        <button data-categoria="pão">🍞 Pão</button>
+                        <button data-categoria="café">☕ Café</button>
+                        <button data-categoria="iogurte">🍦 Iogurte</button>
+                        <button data-categoria="biscoito">🍪 Biscoito</button>
+                        <button data-categoria="suco">🧃 Suco</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="divisor"><span>OU</span></div>
+
+            <section class="captura">
+                <button id="btnImagem" class="btn-captura">
+                    <span class="camera-icone">📷</span>
+                    <strong>Capturar rótulo do produto</strong>
+                    <small>Identificação automática por imagem</small>
+                </button>
+            </section>
+
+            <section class="resultados-section">
+                <div class="titulo-secao">
+                    <h2>Produtos encontrados</h2>
+                    <span id="contadorResultados">0 produtos</span>
+                </div>
+                <div id="resultados" class="resultados-grid">
+                    <div class="estado-vazio">
+                        <span>🥗</span>
+                        <p>Faça uma busca para encontrar alimentos.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ranking" class="ranking-section">
+                <h2>🏆 Meu Ranking</h2>
+                <div id="ranking-lista"><p>Nenhum produto pesquisado ainda.</p></div>
+            </section>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <div>
+            <strong>NutriScan</strong>
+            <p>Análise nutricional inteligente</p>
+        </div>
+        <p>© 2026 NutriScan</p>
+    </footer>
+
+</div>
+
+<div id="modalImagem" class="modal">
+    <div class="modal-content">
+        <button class="modal-fechar" data-fechar-modal>×</button>
+        <h2>📷 Capturar rótulo</h2>
+        <p>Escolha como deseja enviar a imagem.</p>
+
+        <div class="modal-opcoes" id="modal-opcoes">
+            <button data-abrir-camera class="opcao-camera">📸 <strong>Tirar foto</strong></button>
+            <button data-abrir-arquivo class="opcao-arquivo">📁 <strong>Escolher arquivo</strong></button>
+        </div>
+
+        <video id="videoCamera" playsinline muted style="display:none;"></video>
+
+        <div id="camera-acoes" style="display:none;">
+            <button class="btn-processar" data-capturar-foto>📸 Capturar</button>
+            <button class="btn-cancelar" data-parar-camera>Parar</button>
+        </div>
+
+        <canvas id="canvasCamera" style="display:none;"></canvas>
+
+        <div id="preview-area" style="display:none;">
+            <h3>Pré-visualização</h3>
+            <img id="preview-imagem" alt="Pré-visualização">
+            <div class="acoes-imagem">
+                <button class="btn-processar" data-processar-imagem>🔍 Processar imagem</button>
+                <button class="btn-cancelar" data-cancelar-imagem>Cancelar</button>
+            </div>
+        </div>
+
+        <input type="file" id="inputArquivo" accept="image/*" hidden>
+    </div>
+</div>
+
+<script src="js/script.js" defer></script>
+</body>
+</html>
