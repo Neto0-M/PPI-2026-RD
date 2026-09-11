@@ -1,335 +1,506 @@
-// ============================================
-// CÂMERA / ARQUIVO DO DISPOSITIVO
-// ============================================
+// ==========================================
+// CONFIG
+// ==========================================
 
-btnCamera.addEventListener('click', async () => {
+const API = {
+    buscar:     "app/api.php?acao=buscar",
+    cadastro:   "app/cadastro.php",
+    login:      "app/login.php",
+    logout:     "app/logout.php",
+    sessao:     "app/sessao.php",
+    historico:  "app/historico.php",
+    favoritos:  "app/favoritos.php",
+    ranking:    "app/ranking.php",
+};
 
-    // Verifica se o navegador possui suporte à câmera
-    if (
-        'mediaDevices' in navigator &&
-        'getUserMedia' in navigator.mediaDevices
-    ) {
+const $ = (id) => document.getElementById(id);
 
-        mostrarNotificacao('📷 Tentando abrir a câmera...');
+const state = {
+    csrf: null,
+    user: null,
+    abort: null,
+    favs: new Set(),
+};
 
-        try {
 
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { ideal: 'environment' }
-                }
-            });
+// ==========================================
+// API
+// ==========================================
 
-            abrirCamera(stream);
+async function api(url, opts = {}) {
+    const headers = { ...(opts.headers || {}) };
 
-        } catch (erro) {
-
-            console.log('Câmera indisponível:', erro);
-
-            mostrarNotificacao(
-                '📁 Não foi possível usar a câmera. Selecione uma imagem do dispositivo.'
-            );
-
-            abrirSeletorArquivo();
-        }
-
-    } else {
-
-        // Navegador/dispositivo sem suporte à câmera
-        mostrarNotificacao(
-            '📁 Câmera não disponível. Selecione uma imagem do dispositivo.'
-        );
-
-        abrirSeletorArquivo();
+    if (opts.body && typeof opts.body === "object") {
+        headers["Content-Type"] = "application/json";
+        opts.body = JSON.stringify(opts.body);
     }
+
+    if (state.csrf && opts.method && opts.method !== "GET") {
+        headers["X-CSRF-Token"] = state.csrf;
+    }
+
+    const res = await fetch(url, { ...opts, headers, credentials: "include" });
+
+    let data = null;
+    try { data = await res.json(); } catch {}
+
+    if (!res.ok) {
+        throw new Error(data?.mensagem || data?.erro || `Erro ${res.status}`);
+    }
+    return data;
+}
+
+
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    bindEventos();
+    verificarSessao();
 });
 
-
-// ============================================
-// ABRIR CÂMERA
-// ============================================
-
-function abrirCamera(stream) {
-
-    const video = document.createElement('video');
-
-    video.srcObject = stream;
-    video.style.position = 'fixed';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.zIndex = '1000';
-    video.style.objectFit = 'cover';
-    video.autoplay = true;
-    video.playsInline = true;
-
-
-    const overlay = document.createElement('div');
-
-    overlay.style.position = 'fixed';
-    overlay.style.bottom = '30px';
-    overlay.style.left = '50%';
-    overlay.style.transform = 'translateX(-50%)';
-    overlay.style.zIndex = '1001';
-    overlay.style.display = 'flex';
-    overlay.style.gap = '15px';
-
-
-    // BOTÃO CAPTURAR
-    const btnCapturar = document.createElement('button');
-
-    btnCapturar.textContent = '📸 Capturar';
-
-    btnCapturar.style.cssText = `
-        padding: 12px 30px;
-        background: #2c7be5;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    `;
-
-
-    // BOTÃO USAR ARQUIVO
-    const btnArquivo = document.createElement('button');
-
-    btnArquivo.textContent = '📁 Arquivo';
-
-    btnArquivo.style.cssText = `
-        padding: 12px 30px;
-        background: #6c5ce7;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    `;
-
-
-    // BOTÃO FECHAR
-    const btnFechar = document.createElement('button');
-
-    btnFechar.textContent = '✕ Fechar';
-
-    btnFechar.style.cssText = `
-        padding: 12px 30px;
-        background: #e74c3c;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    `;
-
-
-    overlay.appendChild(btnCapturar);
-    overlay.appendChild(btnArquivo);
-    overlay.appendChild(btnFechar);
-
-    document.body.appendChild(video);
-    document.body.appendChild(overlay);
-
-
-    // ============================================
-    // FECHAR CÂMERA
-    // ============================================
-
-    btnFechar.addEventListener('click', () => {
-
-        stream.getTracks().forEach(track => track.stop());
-
-        video.remove();
-        overlay.remove();
-
+function bindEventos() {
+    $("btnBuscar")?.addEventListener("click", buscar);
+    $("campoBusca")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); buscar(); }
     });
 
+    document.querySelectorAll(".categorias-lista button").forEach((b) => {
+        b.addEventListener("click", () => {
+            document.querySelectorAll(".categorias-lista button")
+                .forEach((x) => x.classList.remove("ativo"));
+            b.classList.add("ativo");
 
-    // ============================================
-    // ABRIR ARQUIVO
-    // ============================================
-
-    btnArquivo.addEventListener('click', () => {
-
-        stream.getTracks().forEach(track => track.stop());
-
-        video.remove();
-        overlay.remove();
-
-        abrirSeletorArquivo();
-
+            const cat = b.dataset.categoria;
+            if (!cat) return;
+            $("campoBusca").value = cat;
+            buscar();
+        });
     });
 
+    $("btnLogin")?.addEventListener("click", () => abrir("area-login"));
+    $("btnLogout")?.addEventListener("click", logout);
+    document.querySelectorAll("[data-fechar-login]").forEach((b) =>
+        b.addEventListener("click", () => fechar("area-login")));
 
-    // ============================================
-    // CAPTURAR FOTO
-    // ============================================
-
-    btnCapturar.addEventListener('click', () => {
-
-        const canvas = document.createElement('canvas');
-
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-
-        const contexto = canvas.getContext('2d');
-
-        contexto.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        const imagem = canvas.toDataURL('image/png');
-
-        stream.getTracks().forEach(track => track.stop());
-
-        video.remove();
-        overlay.remove();
-
-        processarImagem(imagem);
-
+    $("linkCadastro")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        $("formLogin").style.display = "none";
+        $("formCadastro").style.display = "flex";
+        $("titulo-login").textContent = "Criar conta";
     });
 
+    $("linkLogin")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        $("formCadastro").style.display = "none";
+        $("formLogin").style.display = "flex";
+        $("titulo-login").textContent = "Entrar no NutriScan";
+    });
+
+    $("formLogin")?.addEventListener("submit", (e) => { e.preventDefault(); login(); });
+    $("formCadastro")?.addEventListener("submit", (e) => { e.preventDefault(); cadastro(); });
+
+    $("btnImagem")?.addEventListener("click", abrirModalImagem);
+    document.querySelectorAll("[data-fechar-modal]").forEach((b) =>
+        b.addEventListener("click", fecharModalImagem));
+    document.querySelector("[data-abrir-camera]")?.addEventListener("click", abrirCamera);
+    document.querySelector("[data-abrir-arquivo]")?.addEventListener("click", abrirArquivo);
+    document.querySelector("[data-capturar-foto]")?.addEventListener("click", capturarFoto);
+    document.querySelector("[data-parar-camera]")?.addEventListener("click", pararCamera);
+    document.querySelector("[data-processar-imagem]")?.addEventListener("click", processarImagem);
+    document.querySelector("[data-cancelar-imagem]")?.addEventListener("click", cancelarImagem);
+    $("inputArquivo")?.addEventListener("change", onArquivo);
+
+    document.querySelectorAll(".login-overlay, .modal").forEach((m) => {
+        m.addEventListener("click", (e) => {
+            if (e.target === m) { m.classList.remove("aberto"); pararCamera(); }
+        });
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            document.querySelectorAll(".login-overlay.aberto, .modal.aberto")
+                .forEach((m) => m.classList.remove("aberto"));
+            pararCamera();
+        }
+    });
+}
+
+const abrir  = (id) => $(id)?.classList.add("aberto");
+const fechar = (id) => $(id)?.classList.remove("aberto");
+
+
+// ==========================================
+// SESSÃO
+// ==========================================
+
+async function verificarSessao() {
+    try {
+        const d = await api(API.sessao);
+        if (!d?.logado) return;
+
+        state.user = { id: d.id, nome: d.nome, email: d.email };
+        state.csrf = d.csrf_token;
+
+        $("usuarioLogado").textContent = `👤 ${d.nome}`;
+        $("usuarioLogado").style.display = "inline";
+        $("btnLogin").style.display = "none";
+        $("btnLogout").style.display = "inline";
+
+        carregarRanking();
+        carregarHistorico();
+        carregarFavoritos();
+    } catch {}
 }
 
 
-// ============================================
-// SELETOR DE ARQUIVOS DO DISPOSITIVO
-// ============================================
+// ==========================================
+// BUSCA
+// ==========================================
 
-function abrirSeletorArquivo() {
+async function buscar() {
+    const termo = $("campoBusca").value.trim();
+    if (!termo) return alert("Digite o nome de um produto.");
 
-    const input = document.createElement('input');
+    if (state.abort) state.abort.abort();
+    state.abort = new AbortController();
 
-    input.type = 'file';
+    $("contadorResultados").textContent = "Carregando...";
+    $("resultados").innerHTML = `
+        <div class="estado-vazio"><span>🔄</span><p>Buscando produtos...</p></div>`;
 
-    input.accept = 'image/*';
+    try {
+        const url = `${API.buscar}&termo=${encodeURIComponent(termo)}`;
+        const produtos = await api(url, { signal: state.abort.signal });
+        mostrarResultados(produtos);
+    } catch (e) {
+        if (e.name === "AbortError") return;
+        $("contadorResultados").textContent = "0 produtos";
+        $("resultados").innerHTML = `
+            <div class="estado-vazio">
+                <span>❌</span><p>Não foi possível consultar.</p>
+                <small>Tente novamente.</small>
+            </div>`;
+    }
+}
 
-    // Permite selecionar foto da câmera em dispositivos compatíveis
-    input.capture = 'environment';
+function mostrarResultados(produtos) {
+    $("contadorResultados").textContent = `${produtos.length} produtos`;
 
-    input.style.display = 'none';
+    if (!produtos.length) {
+        $("resultados").innerHTML = `
+            <div class="estado-vazio">
+                <span>🔎</span><p>Nenhum produto encontrado.</p>
+            </div>`;
+        return;
+    }
 
-    document.body.appendChild(input);
+    const grid = $("resultados");
+    grid.innerHTML = "";
 
+    produtos.forEach((p) => {
+        const card = document.createElement("article");
+        card.className = "cartao-produto";
 
-    input.addEventListener('change', () => {
+        const h3 = document.createElement("h3");
+        h3.textContent = p.nome || "Sem nome";
+        card.appendChild(h3);
 
-        const arquivo = input.files[0];
+        [`🔥 ${p.calorias ?? "-"} kcal / 100g`,
+         `🥩 Proteínas: ${p.proteinas ?? "-"}g`,
+         `🍞 Carboidratos: ${p.carboidratos ?? "-"}g`,
+         `🥑 Gorduras: ${p.gorduras ?? "-"}g`,
+         `🌾 Fibras: ${p.fibras ?? "-"}g`
+        ].forEach((txt) => {
+            const el = document.createElement("p");
+            el.className = "nutri-info";
+            el.textContent = txt;
+            card.appendChild(el);
+        });
 
-        if (!arquivo) {
-            input.remove();
-            return;
+        if (p.codigo_barras) {
+            const s = document.createElement("small");
+            s.textContent = `Código: ${p.codigo_barras}`;
+            card.appendChild(s);
         }
 
+        if (state.user) {
+            const acoes = document.createElement("div");
+            acoes.className = "cartao-acoes";
 
-        // Verifica se é uma imagem
-        if (!arquivo.type.startsWith('image/')) {
+            const btn = document.createElement("button");
+            const fav = state.favs.has(p.id);
+            btn.textContent = fav ? "♥ Favorito" : "♡ Favoritar";
+            if (fav) btn.classList.add("favoritado");
+            btn.addEventListener("click", () => toggleFav(p.id, btn));
+            acoes.appendChild(btn);
 
-            mostrarNotificacao(
-                '❌ Selecione um arquivo de imagem.'
-            );
+            card.appendChild(acoes);
 
-            input.remove();
-
-            return;
+            salvarHistorico(p.id).catch(() => {});
         }
 
-
-        const leitor = new FileReader();
-
-
-        leitor.onload = function (evento) {
-
-            const imagem = evento.target.result;
-
-            processarImagem(imagem);
-
-        };
-
-
-        leitor.onerror = function () {
-
-            mostrarNotificacao(
-                '❌ Não foi possível carregar a imagem.'
-            );
-
-        };
-
-
-        leitor.readAsDataURL(arquivo);
-
-        input.remove();
-
+        grid.appendChild(card);
     });
-
-
-    // Abre o explorador de arquivos/galeria
-    input.click();
-
 }
 
 
-// ============================================
-// PROCESSAR IMAGEM
-// ============================================
+// ==========================================
+// HISTÓRICO
+// ==========================================
 
-function processarImagem(imagem) {
+async function salvarHistorico(id) {
+    if (!state.user) return;
+    await api(API.historico, { method: "POST", body: { alimento_id: id } });
+    carregarHistorico();
+    carregarRanking();
+}
 
-    mostrarNotificacao(
-        '📸 Imagem carregada! Analisando...'
-    );
+async function carregarHistorico() {
+    if (!state.user) return;
+    const lista = $("historico-lista");
 
+    try {
+        const dados = await api(API.historico);
+        if (!dados.length) {
+            lista.innerHTML = "<p>Nenhuma pesquisa recente.</p>";
+            return;
+        }
+        lista.innerHTML = "";
+        dados.forEach((h) => lista.appendChild(itemLista(h.nome, () => deletarHistorico(h.id))));
+    } catch {}
+}
 
-    // Mostra a imagem selecionada
-    resultadosDiv.innerHTML = `
-        <div style="
-            width:100%;
-            text-align:center;
-            padding:20px;
-        ">
+async function deletarHistorico(id) {
+    await api(API.historico, { method: "DELETE", body: { id } });
+    carregarHistorico();
+}
 
-            <h3>📸 Imagem selecionada</h3>
+function itemLista(texto, onRemover) {
+    const div = document.createElement("div");
+    div.className = "lista-item";
 
-            <img
-                src="${imagem}"
-                style="
-                    max-width:100%;
-                    max-height:300px;
-                    margin-top:15px;
-                    border-radius:12px;
-                    box-shadow:0 2px 10px rgba(0,0,0,0.15);
-                "
-            >
+    const span = document.createElement("span");
+    span.textContent = texto;
+    div.appendChild(span);
 
-            <p style="
-                margin-top:15px;
-                color:#666;
-            ">
-                🔍 Analisando imagem...
-            </p>
+    const btn = document.createElement("button");
+    btn.textContent = "×";
+    btn.title = "Remover";
+    btn.addEventListener("click", onRemover);
+    div.appendChild(btn);
 
-        </div>
-    `;
-
-
-    /*
-     * Aqui posteriormente podemos colocar:
-     *
-     * - Leitura do código de barras
-     * - OCR do nome do alimento
-     * - Identificação do produto
-     * - Busca automática na Open Food Facts
-     *
-     */
+    return div;
+}
 
 
-    mostrarNotificacao(
-        '✅ Imagem carregada com sucesso!'
-    );
+// ==========================================
+// FAVORITOS
+// ==========================================
 
+async function carregarFavoritos() {
+    if (!state.user) return;
+    const lista = $("favoritos-lista");
+
+    try {
+        const dados = await api(API.favoritos);
+        state.favs = new Set(dados.map((f) => f.id));
+
+        if (!dados.length) {
+            lista.innerHTML = "<p>Seus alimentos favoritos aparecerão aqui.</p>";
+            return;
+        }
+        lista.innerHTML = "";
+        dados.forEach((f) => lista.appendChild(itemLista(f.nome, () => toggleFav(f.id))));
+    } catch {}
+}
+
+async function toggleFav(id, botao) {
+    if (!state.user) {
+        abrir("area-login");
+        return;
+    }
+
+    const acao = state.favs.has(id) ? "remover" : "adicionar";
+    await api(API.favoritos, { method: "POST", body: { alimento_id: id, acao } });
+
+    if (acao === "remover") state.favs.delete(id);
+    else state.favs.add(id);
+
+    if (botao) {
+        const fav = state.favs.has(id);
+        botao.textContent = fav ? "♥ Favorito" : "♡ Favoritar";
+        botao.classList.toggle("favoritado", fav);
+    }
+
+    carregarFavoritos();
+}
+
+
+// ==========================================
+// RANKING
+// ==========================================
+
+async function carregarRanking() {
+    if (!state.user) return;
+    const lista = $("ranking-lista");
+
+    try {
+        const dados = await api(`${API.ranking}?tipo=pessoal`);
+        if (!dados.length) {
+            lista.innerHTML = "<p>Nenhum produto pesquisado ainda.</p>";
+            return;
+        }
+
+        const ul = document.createElement("ul");
+        ul.className = "ranking-lista";
+
+        dados.forEach((r, i) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<span>${i + 1}º ${r.nome}</span><span>${r.pontuacao} pts</span>`;
+            ul.appendChild(li);
+        });
+
+        lista.innerHTML = "";
+        lista.appendChild(ul);
+    } catch {}
+}
+
+
+// ==========================================
+// LOGIN / CADASTRO / LOGOUT
+// ==========================================
+
+async function login() {
+    const email = $("loginEmail").value.trim();
+    const senha = $("loginSenha").value;
+    if (!email || !senha) return alert("Preencha e-mail e senha.");
+
+    try {
+        await api(API.login, { method: "POST", body: { email, senha } });
+        fechar("area-login");
+        await verificarSessao();
+    } catch (e) { alert(e.message); }
+}
+
+async function cadastro() {
+    const nome  = $("cadastroNome").value.trim();
+    const email = $("cadastroEmail").value.trim();
+    const senha = $("cadastroSenha").value;
+    if (!nome || !email || !senha) return alert("Preencha todos os campos.");
+
+    try {
+        await api(API.cadastro, { method: "POST", body: { nome, email, senha } });
+        fechar("area-login");
+        await verificarSessao();
+    } catch (e) { alert(e.message); }
+}
+
+async function logout() {
+    await api(API.logout, { method: "POST" });
+    location.reload();
+}
+
+
+// ==========================================
+// IMAGEM
+// ==========================================
+
+let stream = null;
+
+function abrirModalImagem() {
+    abrir("modalImagem");
+    resetModal();
+}
+
+function fecharModalImagem() {
+    fechar("modalImagem");
+    cancelarImagem();
+}
+
+function resetModal() {
+    $("modal-opcoes").style.display = "";
+    $("camera-acoes").style.display = "none";
+    $("preview-area").style.display = "none";
+    $("videoCamera").style.display  = "none";
+    $("preview-imagem").src = "";
+    $("inputArquivo").value = "";
+}
+
+function abrirArquivo() { $("inputArquivo")?.click(); }
+
+function onArquivo(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+        alert("Selecione uma imagem.");
+        e.target.value = "";
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => preview(ev.target.result);
+    reader.readAsDataURL(file);
+}
+
+function preview(src) {
+    $("modal-opcoes").style.display = "none";
+    $("preview-area").style.display = "block";
+    $("preview-imagem").src = src;
+}
+
+function cancelarImagem() {
+    resetModal();
+    pararCamera();
+}
+
+async function abrirCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+        alert("Câmera não suportada.");
+        return abrirArquivo();
+    }
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+        });
+        const video = $("videoCamera");
+        video.srcObject = stream;
+        video.style.display = "block";
+        await video.play();
+        $("modal-opcoes").style.display = "none";
+        $("camera-acoes").style.display = "flex";
+    } catch {
+        pararCamera();
+        alert("Não foi possível acessar a câmera.");
+        abrirArquivo();
+    }
+}
+
+function capturarFoto() {
+    const video  = $("videoCamera");
+    const canvas = $("canvasCamera");
+    if (!video.videoWidth) return alert("Câmera não pronta.");
+
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    pararCamera();
+    preview(canvas.toDataURL("image/jpeg", 0.9));
+}
+
+function pararCamera() {
+    if (stream) {
+        stream.getTracks().forEach((t) => t.stop());
+        stream = null;
+    }
+    const v = $("videoCamera");
+    if (v) { v.srcObject = null; v.style.display = "none"; }
+    $("camera-acoes").style.display = "none";
+}
+
+function processarImagem() {
+    if (!$("preview-imagem").getAttribute("src")) {
+        return alert("Selecione ou tire uma foto primeiro.");
+    }
+    alert("Imagem pronta. OCR será implementado em breve.");
 }
