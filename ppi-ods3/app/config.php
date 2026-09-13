@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // ==========================================
-// CONFIGURAÇÕES
+// BANCO DE DADOS
 // ==========================================
 
 const DB_HOST = 'localhost';
@@ -11,10 +11,6 @@ const DB_USER = 'root';
 const DB_PASS = '';
 
 const APP_ENV = 'development';
-
-// ==========================================
-// CONEXÃO
-// ==========================================
 
 try {
     $pdo = new PDO(
@@ -50,8 +46,8 @@ function sessao(): void {
 }
 
 // ==========================================
-// OPEN FOOD FACTSa
+// OPEN FOOD FACTS
 // ==========================================
 
 const OFF_URL    = 'https://br.openfoodfacts.org/cgi/search.pl';
-const USER_AGENT = 'NutriScan/1.0';
+const USER_AGENT = 'PALADAR/1.0';

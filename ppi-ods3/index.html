@@ -3,36 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriScan - Análise Nutricional</title>
+    <title>PALADAR — Plataforma Automatizada de Leitura e Análise De Alimentos e Rótulos</title>
+    <meta name="description" content="Plataforma Automatizada de Leitura e Análise De Alimentos e Rótulos. Facilita escolhas alimentares saudáveis e econômicas.">
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
 
     <header class="cabecalho">
-        <div class="logo">
-            <div class="logo-icone">🔍</div>
+        <div class="logo" title="Plataforma Automatizada de Leitura e Análise De Alimentos e Rótulos">
+            <img src="logo.png" alt="PALADAR" class="logo-imagem">
             <div>
-                <h1>NutriScan</h1>
-                <p>Análise nutricional inteligente</p>
+                <h1>PALADAR</h1>
+                <p class="logo-acronimo">
+                    <span>P</span>lataforma <span>A</span>utomatizada de
+                    <span>L</span>eitura e <span>A</span>nálise
+                    <span>D</span>e <span>A</span>limentos e <span>R</span>ótulos
+                </p>
             </div>
         </div>
 
         <nav class="navegacao">
-            <a href="#" id="linkRanking">🏆 Ranking</a>
-            <a href="#" id="linkHistorico">↩ Histórico</a>
-            <a href="#" id="linkFavoritos">♡ Favoritos</a>
-            <button id="btnLogin">🔐 Login</button>
-            <button id="btnLogout" style="display:none;">🚪 Sair</button>
-            <span id="usuarioLogado" style="display:none;font-size:13px;color:#79518c;"></span>
+            <a href="#" id="linkRanking">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                    <path d="M4 22h16"/>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                </svg>
+                Ranking
+            </a>
+            <a href="#" id="linkHistorico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Histórico
+            </a>
+            <a href="#" id="linkFavoritos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                Favoritos
+            </a>
+            <button id="btnLogin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+                Login
+            </button>
+            <button id="btnLogout" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sair
+            </button>
+            <span id="usuarioLogado" class="usuario-logado" style="display:none;"></span>
         </nav>
     </header>
 
     <!-- MODAL LOGIN -->
     <div id="area-login" class="login-overlay">
         <div class="login-box">
-            <button class="fechar-login" data-fechar-login>×</button>
-            <h2 id="titulo-login">Entrar no NutriScan</h2>
+            <button class="fechar-login" data-fechar-login aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h2 id="titulo-login">Entrar no PALADAR</h2>
 
             <form id="formLogin">
                 <input type="email" id="loginEmail" placeholder="Seu email" required>
@@ -52,75 +98,124 @@
     </div>
 
     <!-- MODAL RANKING -->
-    <div id="modalRanking" class="login-overlay">
-        <div class="login-box">
-            <button class="fechar-login" data-fechar-ranking>×</button>
-            <h2>🏆 Meu Ranking</h2>
-            <div id="ranking-modal-lista">
-                <p>Nenhum produto pesquisado ainda.</p>
+    <div id="modalRanking" class="modal-ranking">
+        <div class="modal-ranking-conteudo">
+
+            <button class="modal-ranking-fechar" data-fechar-ranking aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+
+            <div class="modal-ranking-icone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                    <path d="M4 22h16"/>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                </svg>
             </div>
+
+            <h2 class="modal-ranking-titulo">Top 3 produtos</h2>
+            <p class="modal-ranking-sub">Os alimentos com os maiores scores nutricionais.</p>
+
+            <div class="modal-ranking-tipo">
+                <button data-tipo="pessoal" class="ativo">Meu ranking</button>
+                <button data-tipo="global">Ranking global</button>
+            </div>
+
+            <div class="modal-ranking-abas" id="rankingAbas">
+                <button data-cat="geral" class="ativo">Geral</button>
+            </div>
+
+            <div class="modal-ranking-podio" id="rankingPodio">
+                <p class="modal-ranking-vazio">Carregando...</p>
+            </div>
+
+            <div class="modal-ranking-rodape" id="rankingRodape"></div>
+
         </div>
     </div>
 
     <!-- MODAL HISTÓRICO -->
     <div id="modalHistorico" class="login-overlay">
         <div class="login-box">
-            <button class="fechar-login" data-fechar-historico>×</button>
-            <h2>🕘 Histórico</h2>
-            <div id="historico-modal-lista">
-                <p>Nenhuma pesquisa recente.</p>
-            </div>
+            <button class="fechar-login" data-fechar-historico aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h2>Histórico</h2>
+            <div id="historico-modal-lista"><p>Nenhuma pesquisa recente.</p></div>
         </div>
     </div>
 
     <!-- MODAL FAVORITOS -->
     <div id="modalFavoritos" class="login-overlay">
         <div class="login-box">
-            <button class="fechar-login" data-fechar-favoritos>×</button>
-            <h2>♡ Favoritos</h2>
-            <div id="favoritos-modal-lista">
-                <p>Seus alimentos favoritos aparecerão aqui.</p>
-            </div>
+            <button class="fechar-login" data-fechar-favoritos aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h2>Favoritos</h2>
+            <div id="favoritos-modal-lista"><p>Seus alimentos favoritos aparecerão aqui.</p></div>
         </div>
     </div>
 
     <main>
-
         <section class="conteudo-principal">
 
             <section class="hero">
-                <span class="badge">✨ Análise nutricional com inteligência artificial</span>
+                <span class="badge-hero">Plataforma Automatizada de Leitura e Análise De Alimentos e Rótulos</span>
                 <h2>Escolha alimentos<br>mais saudáveis</h2>
                 <p>Busque um produto ou fotografe o rótulo para ver a tabela nutricional completa e descobrir alternativas com melhor custo-benefício.</p>
             </section>
 
             <section class="secao-busca">
                 <div class="barra-busca">
-                    <span class="icone-busca">🔍</span>
+                    <span class="icone-busca">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </span>
                     <input type="text" id="campoBusca" placeholder="Buscar produto por nome ou marca...">
                     <button id="btnBuscar">Buscar</button>
                 </div>
 
                 <div class="categorias">
-                    <span>Sugestões:</span>
+                    <span class="categorias-titulo">Sugestões</span>
                     <div class="categorias-lista">
-                        <button data-categoria="leite">🥛 Leite</button>
-                        <button data-categoria="arroz">🍚 Arroz</button>
-                        <button data-categoria="feijão">🫘 Feijão</button>
-                        <button data-categoria="pão">🍞 Pão</button>
-                        <button data-categoria="café">☕ Café</button>
-                        <button data-categoria="iogurte">🍦 Iogurte</button>
-                        <button data-categoria="biscoito">🍪 Biscoito</button>
-                        <button data-categoria="suco">🧃 Suco</button>
+                        <button data-categoria="carne">Carne</button>
+                        <button data-categoria="frango">Frango</button>
+                        <button data-categoria="peixe">Peixe</button>
+                        <button data-categoria="ovo">Ovos</button>
+                        <button data-categoria="leite">Leite</button>
+                        <button data-categoria="arroz">Arroz</button>
+                        <button data-categoria="feijão">Feijão</button>
+                        <button data-categoria="fruta">Frutas</button>
+                        <button data-categoria="verdura">Verduras</button>
+                        <button data-categoria="bebida">Bebidas</button>
                     </div>
                 </div>
             </section>
 
-            <div class="divisor"><span>OU</span></div>
+            <div class="divisor"><span>ou</span></div>
 
             <section class="captura">
                 <button id="btnImagem" class="btn-captura">
-                    <span class="camera-icone">📷</span>
+                    <span class="camera-icone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                    </span>
                     <strong>Capturar rótulo do produto</strong>
                     <small>Identificação automática por imagem</small>
                 </button>
@@ -133,46 +228,70 @@
                 </div>
                 <div id="resultados" class="resultados-grid">
                     <div class="estado-vazio">
-                        <span>🥗</span>
+                        <span class="estado-vazio-icone">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+                                <path d="M7 2v20"/>
+                                <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+                            </svg>
+                        </span>
                         <p>Faça uma busca para encontrar alimentos.</p>
                     </div>
                 </div>
             </section>
 
-            <section id="ranking" class="ranking-section">
-                <h2>🏆 Meu Ranking</h2>
-                <div id="ranking-lista"><p>Nenhum produto pesquisado ainda.</p></div>
+            <section id="ranking" class="ranking-section" style="display:none;">
+                <h2>Meu Ranking</h2>
+                <div id="ranking-lista"></div>
             </section>
 
         </section>
-
     </main>
 
     <footer>
         <div>
-            <strong>NutriScan</strong>
-            <p>Análise nutricional inteligente</p>
+            <strong>PALADAR</strong>
+            <p class="rodape-acronimo">
+                Plataforma Automatizada de Leitura e Análise De Alimentos e Rótulos
+            </p>
         </div>
-        <p>© 2026 NutriScan</p>
+        <p>© 2026 PALADAR</p>
     </footer>
 
 </div>
 
+<!-- MODAL IMAGEM -->
 <div id="modalImagem" class="modal">
     <div class="modal-content">
-        <button class="modal-fechar" data-fechar-modal>×</button>
-        <h2>📷 Capturar rótulo</h2>
+        <button class="modal-fechar" data-fechar-modal aria-label="Fechar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <h2>Capturar rótulo</h2>
         <p>Escolha como deseja enviar a imagem.</p>
 
         <div class="modal-opcoes" id="modal-opcoes">
-            <button data-abrir-camera class="opcao-camera">📸 <strong>Tirar foto</strong></button>
-            <button data-abrir-arquivo class="opcao-arquivo">📁 <strong>Escolher arquivo</strong></button>
+            <button data-abrir-camera class="opcao-camera">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <strong>Tirar foto</strong>
+            </button>
+            <button data-abrir-arquivo class="opcao-arquivo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                <strong>Escolher arquivo</strong>
+            </button>
         </div>
 
         <video id="videoCamera" playsinline muted style="display:none;"></video>
 
         <div id="camera-acoes" style="display:none;">
-            <button class="btn-processar" data-capturar-foto>📸 Capturar</button>
+            <button class="btn-processar" data-capturar-foto>Capturar</button>
             <button class="btn-cancelar" data-parar-camera>Parar</button>
         </div>
 
@@ -182,7 +301,7 @@
             <h3>Pré-visualização</h3>
             <img id="preview-imagem" alt="Pré-visualização">
             <div class="acoes-imagem">
-                <button class="btn-processar" data-processar-imagem>🔍 Processar imagem</button>
+                <button class="btn-processar" data-processar-imagem>Processar imagem</button>
                 <button class="btn-cancelar" data-cancelar-imagem>Cancelar</button>
             </div>
         </div>
@@ -191,6 +310,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="js/script.js" defer></script>
 </body>
 </html>

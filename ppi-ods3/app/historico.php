@@ -45,18 +45,25 @@ if ($metodo === 'POST') {
     json(['sucesso' => true]);
 }
 
-// ── DELETE: deletar ──
+// ── DELETE: deletar um item ──
 if ($metodo === 'DELETE') {
     validarCsrf();
-    $id = (int) (body()['id'] ?? 0);
+    $in = body();
 
+    // Se veio "limpar_tudo", apaga todos do usuário
+    if (($in['acao'] ?? '') === 'limpar_tudo') {
+        $pdo->prepare("DELETE FROM historico_pesquisas WHERE usuario_id = ?")
+            ->execute([$u['id']]);
+        json(['sucesso' => true, 'mensagem' => 'Histórico limpo']);
+    }
+
+    // Senão, apaga só o item pelo ID
+    $id = (int) ($in['id'] ?? 0);
     if ($id <= 0) json(['erro' => 'ID inválido'], 400);
 
     $stmt = $pdo->prepare("DELETE FROM historico_pesquisas WHERE id = ? AND usuario_id = ?");
     $stmt->execute([$id, $u['id']]);
-
     if ($stmt->rowCount() === 0) json(['erro' => 'Não encontrado'], 404);
+
     json(['sucesso' => true]);
 }
-
-json(['erro' => 'Método inválido'], 405);
